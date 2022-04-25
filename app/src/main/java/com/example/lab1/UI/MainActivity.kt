@@ -45,47 +45,59 @@ class MainActivity : AppCompatActivity() {
 
     private fun load(){
         MainScope().launch {
-            val tariffsCallback = object: Callback<List<Tariff>>{
-                override fun onResponse(call: Call<List<Tariff>>, response: Response<List<Tariff>>) {
-                    val tariffs = response.body() ?: onFailure(call, Exception())
-                    val items = (tariffs as List<Tariff>).map(::mapTariffToItemTariff)
-                    setTariffs(items)
-                }
-
-                override fun onFailure(call: Call<List<Tariff>>, t: Throwable) {
-                    makeToast()
-                }
-            }
-
-            val balanceCallback = object : Callback<List<Balance>>{
-                override fun onResponse(call: Call<List<Balance>>, response: Response<List<Balance>>) {
-                    val balance = response.body()?.get(0) ?: onFailure(call, Exception())
-                    val casted = balance as Balance
-                    setBalance(casted)
-                }
-
-                override fun onFailure(call: Call<List<Balance>>, t: Throwable) {
-                    makeToast()
-                }
-            }
-
-            val userCallback = object : Callback<List<UserInfo>>{
-                override fun onResponse( call: Call<List<UserInfo>>,  response: Response<List<UserInfo>> ) {
-                    val user = response.body()?.get(0) ?: onFailure(call, Exception())
-                    val cated = user as UserInfo
-                }
-
-                override fun onFailure(call: Call<List<UserInfo>>, t: Throwable) {
-                    makeToast()
-                }
-            }
-            api.getTariffs().enqueue(tariffsCallback)
-            api.getBalance().enqueue(balanceCallback)
-            api.getUserInfo().enqueue(userCallback)
-
-
+            setTariffs(api.getTariffs())
+        }
+        MainScope().launch {
+            setBalance(api.getBalance()[0] )
+        }
+        MainScope().launch {
+            setUserInfo(api.getUserInfo()[0])
         }
     }
+
+//    private fun load(){
+//        MainScope().launch {
+//            val tariffsCallback = object: Callback<List<Tariff>>{
+//                override fun onResponse(call: Call<List<Tariff>>, response: Response<List<Tariff>>) {
+//                    val tariffs = response.body() ?: onFailure(call, Exception())
+//                    val items = (tariffs as List<Tariff>).map(::mapTariffToItemTariff)
+//                    setTariffs(items)
+//                }
+//
+//                override fun onFailure(call: Call<List<Tariff>>, t: Throwable) {
+//                    makeToast()
+//                }
+//            }
+//
+//            val balanceCallback = object : Callback<List<Balance>>{
+//                override fun onResponse(call: Call<List<Balance>>, response: Response<List<Balance>>) {
+//                    val balance = response.body()?.get(0) ?: onFailure(call, Exception())
+//                    val casted = balance as Balance
+//                    setBalance(casted)
+//                }
+//
+//                override fun onFailure(call: Call<List<Balance>>, t: Throwable) {
+//                    makeToast()
+//                }
+//            }
+//
+//            val userCallback = object : Callback<List<UserInfo>>{
+//                override fun onResponse( call: Call<List<UserInfo>>,  response: Response<List<UserInfo>> ) {
+//                    val user = response.body()?.get(0) ?: onFailure(call, Exception())
+//                    val cated = user as UserInfo
+//                }
+//
+//                override fun onFailure(call: Call<List<UserInfo>>, t: Throwable) {
+//                    makeToast()
+//                }
+//            }
+//            api.getTariffs().enqueue(tariffsCallback)
+//            api.getBalance().enqueue(balanceCallback)
+//            api.getUserInfo().enqueue(userCallback)
+//
+//
+//        }
+//    }
 
     private fun setUserInfo(userInfo: UserInfo){
         con.add(
@@ -105,9 +117,9 @@ class MainActivity : AppCompatActivity() {
         ))
     }
 
-    private fun setTariffs(tariffs : List<ItemTarif>)=
+    private fun setTariffs(tariffs : List<Tariff>)=
         tariffs.forEach{
-            con.add(it)
+            con.add(mapTariffToItemTariff(it))
         }
 
     private fun setBalance(balance: Balance){

@@ -9,11 +9,11 @@ import retrofit2.http.GET
 interface Api {
 
     @GET("userInfo")
-    fun getUserInfo(): Call<List<UserInfo>>
+    suspend fun getUserInfo(): List<UserInfo>
 
     @GET("tariffs")
-    fun getTariffs(): Call<List<Tariff>>
+    suspend fun getTariffs(): List<Tariff>
 
     @GET("balance")
-    fun getBalance(): Call<List<Balance>>
+    suspend fun getBalance(): List<Balance>
 }
