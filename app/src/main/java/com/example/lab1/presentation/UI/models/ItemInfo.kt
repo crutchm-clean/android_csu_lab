@@ -1,4 +1,4 @@
-package com.example.lab1.UI.models
+package com.example.lab1.presentation.UI.models
 
 import android.graphics.drawable.Drawable
 

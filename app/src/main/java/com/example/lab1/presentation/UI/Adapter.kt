@@ -1,26 +1,23 @@
 package com.example.lab1
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import  androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import com.example.lab1.UI.ViewHolder
-import com.example.lab1.UI.models.Item
-import com.example.lab1.UI.models.ItemInfo
-import com.example.lab1.UI.models.ItemTarif
-import javax.security.auth.callback.Callback
+import com.example.lab1.presentation.UI.ViewHolder
+import com.example.lab1.presentation.UI.models.Item
+import com.example.lab1.presentation.UI.models.ItemInfo
+import com.example.lab1.presentation.UI.models.ItemTarif
 
 class Adapter : ListAdapter<Item, ViewHolder>(CardCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = ViewHolder(
-        when(currentList[viewType]){
-            is ItemTarif ->{
+        when(viewType){
+            1 ->{
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.layout_item_tarif, parent, false)
             }
-            is ItemInfo ->{
+            2 ->{
                 LayoutInflater.from(parent.context)
                     .inflate(R.layout.layout_item_info, parent, false)
             }
@@ -29,6 +26,13 @@ class Adapter : ListAdapter<Item, ViewHolder>(CardCallBack()) {
                     .inflate(R.layout.layout_item_title, parent, false)
             }
         })
+
+
+    override fun getItemViewType(position: Int): Int = when(currentList[position]){
+        is ItemTarif -> 1
+        is ItemInfo -> 2
+        else -> 3
+    }
 
 
 

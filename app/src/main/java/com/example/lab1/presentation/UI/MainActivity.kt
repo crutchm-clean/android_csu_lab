@@ -1,31 +1,35 @@
-package com.example.lab1.UI
+package com.example.lab1.presentation.UI
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lab1.Adapter
 import com.example.lab1.R
-import com.example.lab1.UI.models.Item
-import com.example.lab1.UI.models.ItemInfo
-import com.example.lab1.UI.models.ItemTarif
-import com.example.lab1.UI.models.ItemTitle
-import com.example.lab1.network.models.Balance
-import com.example.lab1.network.models.Tariff
-import com.example.lab1.network.models.UserInfo
-import com.example.lab1.network.retrofit.ApiProvider
-import com.example.lab1.network.retrofit.RetrofitClient
+import com.example.lab1.presentation.UI.models.Item
+import com.example.lab1.presentation.UI.models.ItemInfo
+import com.example.lab1.presentation.UI.models.ItemTarif
+import com.example.lab1.presentation.UI.models.ItemTitle
+import com.example.lab1.data.network.retrofit.ApiProvider
+import com.example.lab1.data.network.retrofit.RetrofitClient
+import com.example.lab1.presentation.App
+import com.example.lab1.presentation.viewModels.AbstractViewModel
+import com.example.lab1.presentation.viewModels.ViewModel
+import com.example.lab1.presentation.viewModels.ViewModelFactory
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
+    @Inject lateinit var factory: ViewModelFactory
+
+    private val viewModel by viewModels<AbstractViewModel>{factory}
+
     private lateinit var adapter: Adapter
     private var con = mutableListOf<Item>(
         ItemTitle(
@@ -38,9 +42,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        inject()
         load()
         setAdapter()
         adapter.submitList(con)
+    }
+
+    private fun inject(){
+        App.appComponent.inject(this)
     }
 
     private fun load(){
@@ -55,49 +64,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun load(){
-//        MainScope().launch {
-//            val tariffsCallback = object: Callback<List<Tariff>>{
-//                override fun onResponse(call: Call<List<Tariff>>, response: Response<List<Tariff>>) {
-//                    val tariffs = response.body() ?: onFailure(call, Exception())
-//                    val items = (tariffs as List<Tariff>).map(::mapTariffToItemTariff)
-//                    setTariffs(items)
-//                }
-//
-//                override fun onFailure(call: Call<List<Tariff>>, t: Throwable) {
-//                    makeToast()
-//                }
-//            }
-//
-//            val balanceCallback = object : Callback<List<Balance>>{
-//                override fun onResponse(call: Call<List<Balance>>, response: Response<List<Balance>>) {
-//                    val balance = response.body()?.get(0) ?: onFailure(call, Exception())
-//                    val casted = balance as Balance
-//                    setBalance(casted)
-//                }
-//
-//                override fun onFailure(call: Call<List<Balance>>, t: Throwable) {
-//                    makeToast()
-//                }
-//            }
-//
-//            val userCallback = object : Callback<List<UserInfo>>{
-//                override fun onResponse( call: Call<List<UserInfo>>,  response: Response<List<UserInfo>> ) {
-//                    val user = response.body()?.get(0) ?: onFailure(call, Exception())
-//                    val cated = user as UserInfo
-//                }
-//
-//                override fun onFailure(call: Call<List<UserInfo>>, t: Throwable) {
-//                    makeToast()
-//                }
-//            }
-//            api.getTariffs().enqueue(tariffsCallback)
-//            api.getBalance().enqueue(balanceCallback)
-//            api.getUserInfo().enqueue(userCallback)
-//
-//
-//        }
-//    }
 
     private fun setUserInfo(userInfo: UserInfo){
         con.add(
@@ -139,7 +105,6 @@ class MainActivity : AppCompatActivity() {
         )
 
 
-    @SuppressLint("CutPasteId")
     private fun setAdapter() {
         adapter = Adapter()
         findViewById<RecyclerView>(R.id.RV).adapter = adapter

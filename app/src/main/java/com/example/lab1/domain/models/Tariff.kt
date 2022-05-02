@@ -1,4 +1,4 @@
-package com.example.lab1.network.models
+package com.example.lab1.domain.models
 
 data class Tariff(
     val title: String,

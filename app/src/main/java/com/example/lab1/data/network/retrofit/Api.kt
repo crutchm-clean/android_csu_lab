@@ -1,9 +1,8 @@
-package com.example.lab1.network.retrofit
+package com.example.lab1.data.network.retrofit
 
-import com.example.lab1.network.models.Balance
-import com.example.lab1.network.models.Tariff
-import com.example.lab1.network.models.UserInfo
-import retrofit2.Call
+import com.example.lab1.domain.models.Balance
+import com.example.lab1.domain.models.Tariff
+import com.example.lab1.domain.models.UserInfo
 import retrofit2.http.GET
 
 interface Api {

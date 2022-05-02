@@ -1,14 +1,14 @@
-package com.example.lab1.UI
+package com.example.lab1.presentation.UI
 
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lab1.R
-import com.example.lab1.UI.models.Item
-import com.example.lab1.UI.models.ItemInfo
-import com.example.lab1.UI.models.ItemTarif
-import com.example.lab1.UI.models.ItemTitle
+import com.example.lab1.presentation.UI.models.Item
+import com.example.lab1.presentation.UI.models.ItemInfo
+import com.example.lab1.presentation.UI.models.ItemTarif
+import com.example.lab1.presentation.UI.models.ItemTitle
 
 open class ViewHolder (private var view: View) : RecyclerView.ViewHolder(view) {
     fun bind(item: Item){
