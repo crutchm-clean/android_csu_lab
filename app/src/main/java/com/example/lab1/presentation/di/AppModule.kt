@@ -23,13 +23,11 @@ import dagger.Provides
 class AppModule {
 //obviously provide vm factory
     @Provides
-    fun provideVMFactory(
+    fun provideViewModelFactory(
         userInfoUseCase: GetUserInfoUseCase,
         tariffUseCase: GetTariffUseCase,
         balanceUseCase: GetBalanceUseCase
     ) = ViewModelFactory(userInfoUseCase, tariffUseCase, balanceUseCase)
-
-
 
 //provide repos
     @Provides

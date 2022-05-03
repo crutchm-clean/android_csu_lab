@@ -2,6 +2,8 @@ package com.example.lab1.presentation.UI
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -16,6 +18,9 @@ import com.example.lab1.presentation.UI.models.ItemTarif
 import com.example.lab1.presentation.UI.models.ItemTitle
 import com.example.lab1.data.network.retrofit.ApiProvider
 import com.example.lab1.data.network.retrofit.RetrofitClient
+import com.example.lab1.domain.models.Balance
+import com.example.lab1.domain.models.Tariff
+import com.example.lab1.domain.models.UserInfo
 import com.example.lab1.presentation.App
 import com.example.lab1.presentation.viewModels.AbstractViewModel
 import com.example.lab1.presentation.viewModels.ViewModel
@@ -29,23 +34,26 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var factory: ViewModelFactory
 
     private val viewModel by viewModels<AbstractViewModel>{factory}
-
     private lateinit var adapter: Adapter
+
+
     private var con = mutableListOf<Item>(
         ItemTitle(
             "Тариф"
         )
     )
 
-    private val api = ApiProvider(RetrofitClient()).getApi()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         inject()
+
         load()
-        setAdapter()
-        adapter.submitList(con)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshData()
     }
 
     private fun inject(){
@@ -53,19 +61,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun load(){
-        MainScope().launch {
-            setTariffs(api.getTariffs())
+        controlProgressBar(true)
+        viewModel.balance.observe(this){
+            setBalance(it)
         }
-        MainScope().launch {
-            setBalance(api.getBalance()[0] )
+        viewModel.tariffs.observe(this){
+            setTariffs(it)
         }
-        MainScope().launch {
-            setUserInfo(api.getUserInfo()[0])
+        viewModel.userInfo.observe(this){
+            setUserInfo(it)
+            controlProgressBar(false)
+            setAdapter()
+            adapter.submitList(con)
         }
     }
 
 
     private fun setUserInfo(userInfo: UserInfo){
+        con.add(
+            ItemTitle("информация о пользователе")
+        )
         con.add(
             ItemInfo(userInfo.firstName + ' ' + userInfo.lastName,
                 AppCompatResources.getDrawable(applicationContext, R.drawable.account_circle)
@@ -104,11 +119,19 @@ class MainActivity : AppCompatActivity() {
             tariff.cost.toString()
         )
 
-
+    private fun controlProgressBar(isVisible: Boolean){
+        val pb = findViewById<ProgressBar>(R.id.pb)
+        if(isVisible){
+            pb.visibility = View.VISIBLE
+        } else{
+            pb.visibility = View.INVISIBLE
+        }
+    }
     private fun setAdapter() {
+        val rv = findViewById<RecyclerView>(R.id.RV)
         adapter = Adapter()
-        findViewById<RecyclerView>(R.id.RV).adapter = adapter
-        findViewById<RecyclerView>(R.id.RV).layoutManager = LinearLayoutManager(
+        rv.adapter = adapter
+        rv.layoutManager = LinearLayoutManager(
             this,
             LinearLayoutManager.VERTICAL,
             false
