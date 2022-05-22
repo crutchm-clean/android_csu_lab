@@ -79,7 +79,7 @@ class AppModule(private val context: Context) {
         GetUserInfoUseCaseImpl(repo)
 
     @Provides
-    fun provideDeleteTatiffUseCase(repo: TariffRepository): DeleteTariffUseCase =
+    fun provideDeleteTariffUseCase(repo: TariffRepository): DeleteTariffUseCase =
         DeleteTariffUseCaseImpl(repo)
 
     //provide retrofit
