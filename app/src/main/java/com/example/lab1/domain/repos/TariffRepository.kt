@@ -4,4 +4,6 @@ import com.example.lab1.domain.models.Tariff
 
 interface TariffRepository {
     suspend fun fetchTariff() : List<Tariff>
+
+    suspend fun delete(id: String) : List<Tariff>
 }

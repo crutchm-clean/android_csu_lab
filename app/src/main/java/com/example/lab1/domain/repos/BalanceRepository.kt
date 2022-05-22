@@ -4,4 +4,6 @@ import com.example.lab1.domain.models.Balance
 
 interface BalanceRepository {
     suspend fun fetchBalance() : Balance
+
+
 }
