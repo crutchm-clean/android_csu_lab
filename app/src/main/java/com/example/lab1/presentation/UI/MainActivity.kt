@@ -12,61 +12,40 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lab1.Adapter
 import com.example.lab1.R
-import com.example.lab1.presentation.UI.models.Item
 import com.example.lab1.presentation.UI.models.ItemInfo
 import com.example.lab1.presentation.UI.models.ItemTarif
-import com.example.lab1.presentation.UI.models.ItemTitle
-import com.example.lab1.data.network.retrofit.ApiProvider
-import com.example.lab1.data.network.retrofit.RetrofitClient
 import com.example.lab1.domain.models.Balance
 import com.example.lab1.domain.models.Tariff
 import com.example.lab1.domain.models.UserInfo
 import com.example.lab1.presentation.App
+import com.example.lab1.presentation.UI.models.Item
 import com.example.lab1.presentation.viewModels.AbstractViewModel
-import com.example.lab1.presentation.viewModels.ViewModel
 import com.example.lab1.presentation.viewModels.ViewModelFactory
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var factory: ViewModelFactory
-    private var firstIndex: Int = 1
 
     private val viewModel by viewModels<AbstractViewModel> { factory }
     private lateinit var adapter: Adapter
+    private lateinit var sAdapter: Adapter
+    private var tarriffs = mutableListOf<Item>()
+    private var users = mutableListOf<Item>()
 
-
-    private var con = mutableListOf<Item>(
-        ItemTitle(
-            "Тариф"
-        )
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         inject()
-
         load()
     }
 
     override fun onResume() {
         super.onResume()
-        if (con.count() <= 1) {
-            viewModel.refreshData()
+        viewModel.refreshData()
 
-        } else {
-            var index = 1
-            val count = con.count()
-            while (index != count - 1) {
-                con.removeAt(index)
-                index++
-            }
-            viewModel.refreshData()
-        }
     }
 
     private fun inject() {
@@ -85,28 +64,27 @@ class MainActivity : AppCompatActivity() {
             setUserInfo(it)
             controlProgressBar(false)
             setAdapter()
-            adapter.submitList(con)
+            adapter.submitList(tarriffs)
+            sAdapter.submitList(users)
         }
     }
 
 
     private fun setUserInfo(userInfo: UserInfo) {
-        con.add(
-            ItemTitle("информация о пользователе")
-        )
-        con.add(
+        users = mutableListOf()
+        users.add(
             ItemInfo(
                 userInfo.firstName + ' ' + userInfo.lastName,
                 AppCompatResources.getDrawable(applicationContext, R.drawable.account_circle)
             )
         )
-        con.add(
+        users.add(
             ItemInfo(
                 userInfo.address,
                 AppCompatResources.getDrawable(applicationContext, R.drawable.home_icon)
             )
         )
-        con.add(
+        users.add(
             ItemInfo(
                 "Доступные услуги",
                 AppCompatResources.getDrawable(applicationContext, R.drawable.widgets_icon)
@@ -115,16 +93,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setTariffs(tariffs: List<Tariff>) {
-        var index = 1
-        val count = con.size
-        if(count != 1) {
-            while (index != count - 2) {
-                con.removeAt(index)
-                index++
-            }
-        }
+        tarriffs = mutableListOf()
         tariffs.forEach {
-            con.add(mapTariffToItemTariff(it))
+            this.tarriffs.add(mapTariffToItemTariff(it))
         }
     }
 
@@ -159,9 +130,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun setAdapter() {
         val rv = findViewById<RecyclerView>(R.id.RV)
+        val srv = findViewById<RecyclerView>(R.id.RV2)
         adapter = Adapter()
+        sAdapter = Adapter()
         rv.adapter = adapter
+        srv.adapter = sAdapter
         rv.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.VERTICAL,
+            false
+        )
+        srv.layoutManager = LinearLayoutManager(
             this,
             LinearLayoutManager.VERTICAL,
             false
