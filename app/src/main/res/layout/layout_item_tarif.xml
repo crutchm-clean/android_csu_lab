@@ -6,19 +6,29 @@
     android:layout_height="wrap_content">
     <com.google.android.material.card.MaterialCardView
         android:layout_width="390dp"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="6dp"
         android:padding="6dp"
 
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints">
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom|center"
+            app:layout_constraintTop_toTopOf="@+id/cost"
+            android:text="delete" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="14dp"
             app:layout_constraintTop_toTopOf="parent">
+
             <TextView
                 android:id="@+id/text"
                 android:layout_width="220dp"
@@ -32,7 +42,10 @@
                 android:textStyle="bold"
                 android:textSize="20sp"
                 android:maxLines="1"
-                android:ellipsize="end"/>
+                android:ellipsize="end"
+                />
+
+
 
             <TextView
                 android:id="@+id/cost"
@@ -57,7 +70,9 @@
                 android:layout_marginHorizontal="6dp"/>
 
 
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

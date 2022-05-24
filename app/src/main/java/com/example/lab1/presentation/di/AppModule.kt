@@ -9,6 +9,7 @@ import com.example.lab1.data.network.retrofit.RetrofitClient
 import com.example.lab1.data.repos.BalanceRepositoryImpl
 import com.example.lab1.data.repos.TariffRepositoryImpl
 import com.example.lab1.data.repos.UserInfoRepositoryImpl
+import com.example.lab1.data.room.Migration1
 import com.example.lab1.data.room.RoomDatabase
 import com.example.lab1.data.room.dao.BalanceDao
 import com.example.lab1.data.room.dao.TariffDao
@@ -34,13 +35,20 @@ class AppModule(private val context: Context) {
     @Provides
     fun provideContext() = context
 
+    //provide db
+    @Provides
+    fun provideDatabase(context: Context) =
+        Room.databaseBuilder(context, RoomDatabase::class.java, "db").addMigrations(Migration1).build()
+
+
     //obviously provide vm factory
     @Provides
     fun provideViewModelFactory(
         userInfoUseCase: GetUserInfoUseCase,
         tariffUseCase: GetTariffUseCase,
-        balanceUseCase: GetBalanceUseCase
-    ) = ViewModelFactory(userInfoUseCase, tariffUseCase, balanceUseCase)
+        balanceUseCase: GetBalanceUseCase,
+        deleteTariffUseCase: DeleteTariffUseCase
+    ) = ViewModelFactory(userInfoUseCase, tariffUseCase, balanceUseCase, deleteTariffUseCase)
 
     //provide repos
     @Provides
@@ -55,9 +63,14 @@ class AppModule(private val context: Context) {
     fun provideTariffRepo(apiProvider: ApiProvider, dao: TariffDao): TariffRepository =
         TariffRepositoryImpl(apiProvider, dao)
 
+
     //provide dao
     @Provides
     fun provideBalanceDao(database: RoomDatabase) = database.getBalanceDao()
+
+    @Provides
+    fun providePaymentDao(database: RoomDatabase) = database.getPaymentDao()
+
 
     @Provides
     fun provideTariffDao(database: RoomDatabase) = database.getTariffDao()
@@ -92,8 +105,5 @@ class AppModule(private val context: Context) {
     @Provides
     fun provideApi(apiProvider: ApiProvider): Api = apiProvider.getApi()
 
-    //provide db
-    @Provides
-    fun provideDatabase(context: Context) =
-        Room.databaseBuilder(context, RoomDatabase::class.java, "db").build()
+
 }

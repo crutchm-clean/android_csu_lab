@@ -1,8 +1,10 @@
 package com.example.lab1.presentation.UI
 
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lab1.R
 import com.example.lab1.presentation.UI.models.Item
@@ -27,6 +29,10 @@ open class ViewHolder (private var view: View) : RecyclerView.ViewHolder(view) {
                 desc.text = item.desc
                 val cost = view.findViewById<TextView>(R.id.cost)
                 cost.text = item.cost
+                val delete = view.findViewById<Button>(R.id.delete)
+                delete.setOnClickListener{
+                    item.onClick()
+                }
             }
 
             is ItemTitle -> {

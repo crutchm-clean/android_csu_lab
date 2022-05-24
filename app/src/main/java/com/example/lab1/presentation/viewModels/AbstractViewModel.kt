@@ -13,4 +13,5 @@ abstract class AbstractViewModel : ViewModel() {
     abstract val loading: LiveData<Boolean>
 
     abstract fun refreshData()
+    abstract fun delete(id: String)
 }

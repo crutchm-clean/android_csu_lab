@@ -31,9 +31,11 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var factory: ViewModelFactory
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private var firstIndex: Int = 1
 
-    private val viewModel by viewModels<AbstractViewModel>{factory}
+    private val viewModel by viewModels<AbstractViewModel> { factory }
     private lateinit var adapter: Adapter
 
 
@@ -53,22 +55,33 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData()
+        if (con.count() <= 1) {
+            viewModel.refreshData()
+
+        } else {
+            var index = 1
+            val count = con.count()
+            while (index != count - 1) {
+                con.removeAt(index)
+                index++
+            }
+            viewModel.refreshData()
+        }
     }
 
-    private fun inject(){
+    private fun inject() {
         App.appComponent.inject(this)
     }
 
-    private fun load(){
+    private fun load() {
         controlProgressBar(true)
-        viewModel.balance.observe(this){
+        viewModel.balance.observe(this) {
             setBalance(it)
         }
-        viewModel.tariffs.observe(this){
+        viewModel.tariffs.observe(this) {
             setTariffs(it)
         }
-        viewModel.userInfo.observe(this){
+        viewModel.userInfo.observe(this) {
             setUserInfo(it)
             controlProgressBar(false)
             setAdapter()
@@ -77,12 +90,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setUserInfo(userInfo: UserInfo){
+    private fun setUserInfo(userInfo: UserInfo) {
         con.add(
             ItemTitle("информация о пользователе")
         )
         con.add(
-            ItemInfo(userInfo.firstName + ' ' + userInfo.lastName,
+            ItemInfo(
+                userInfo.firstName + ' ' + userInfo.lastName,
                 AppCompatResources.getDrawable(applicationContext, R.drawable.account_circle)
             )
         )
@@ -92,41 +106,57 @@ class MainActivity : AppCompatActivity() {
                 AppCompatResources.getDrawable(applicationContext, R.drawable.home_icon)
             )
         )
-        con.add( ItemInfo(
-            "Доступные услуги",
-            AppCompatResources.getDrawable(applicationContext, R.drawable.widgets_icon)
-        ))
+        con.add(
+            ItemInfo(
+                "Доступные услуги",
+                AppCompatResources.getDrawable(applicationContext, R.drawable.widgets_icon)
+            )
+        )
     }
 
-    private fun setTariffs(tariffs : List<Tariff>)=
-        tariffs.forEach{
+    private fun setTariffs(tariffs: List<Tariff>) {
+        var index = 1
+        val count = con.size
+        if(count != 1) {
+            while (index != count - 2) {
+                con.removeAt(index)
+                index++
+            }
+        }
+        tariffs.forEach {
             con.add(mapTariffToItemTariff(it))
         }
+    }
 
-    private fun setBalance(balance: Balance){
+    private fun setBalance(balance: Balance) {
         findViewById<TextView>(R.id.bill_money).text = balance.balance.toString()
     }
 
-    private fun makeToast(){
+    private fun makeToast() {
         Toast.makeText(this@MainActivity, "Bad internet connection", Toast.LENGTH_LONG).show()
     }
 
 
-    private fun mapTariffToItemTariff(tariff: Tariff) =
+    private fun mapTariffToItemTariff(tariff: Tariff): ItemTarif =
         ItemTarif(
             tariff.title,
             tariff.desc,
-            tariff.cost.toString()
+            tariff.cost.toString(),
+            onClick = {
+                Toast.makeText(this, "dgsdg", Toast.LENGTH_LONG).show()
+                viewModel.delete(tariff.id)
+            }
         )
 
-    private fun controlProgressBar(isVisible: Boolean){
+    private fun controlProgressBar(isVisible: Boolean) {
         val pb = findViewById<ProgressBar>(R.id.pb)
-        if(isVisible){
+        if (isVisible) {
             pb.visibility = View.VISIBLE
-        } else{
+        } else {
             pb.visibility = View.INVISIBLE
         }
     }
+
     private fun setAdapter() {
         val rv = findViewById<RecyclerView>(R.id.RV)
         adapter = Adapter()
